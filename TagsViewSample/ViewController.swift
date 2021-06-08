@@ -8,36 +8,37 @@
 
 import UIKit
 
+// 与えられたタグのデータ
+let tags = ["aaaa","bbbb","hogehoge","あいうえお","東京特許許可局許可局長","🎉🎉🎉","あめんぼあかいなあいうえお",
+            "aaaa","bbbb","hogehoge","あいうえお","東京特許許可局","🎉🎉","あめんぼあかいなあいうえお",
+            "aaaa","bbbb","hogehoge","あいうえお","東京","🎉🎉🎉","あめんぼ",
+            "aaaa","bbbb","hogehoge","あいうえお","東京","🎉🎉","あめんぼあかいなあいうえお",
+            "aaaa","bbbb","hogehoge","あいうえお","東京特許許可局許可局長","🎉🎉🎉","あめんぼあかいなあいうえお",]
+
+
+
+
 class ViewController: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
-    let tags = ["aaaa","bbbb","hogehoge","あいうえお","東京特許許可局許可局長","🎉🎉🎉","あめんぼあかいなあいうえお",
-                "aaaa","bbbb","hogehoge","あいうえお","東京特許許可局","🎉🎉","あめんぼあかいなあいうえお",
-                "aaaa","bbbb","hogehoge","あいうえお","東京","🎉🎉🎉","あめんぼ",
-                "aaaa","bbbb","hogehoge","あいうえお","東京","🎉🎉","あめんぼあかいなあいうえお",
-                "aaaa","bbbb","hogehoge","あいうえお","東京特許許可局許可局長","🎉🎉🎉","あめんぼあかいなあいうえお",]
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        collectionView.delegate = self
-        collectionView.dataSource = self
         
         setupLayout()
     }
     
     func setupLayout() {
         let layout = TagsCollectionViewLayout()
-
         layout.setup(collectionView: collectionView,
-                     cellType: TagCollectionViewCell.self,
-                     horizontalMargin: 10,
-                     verticalMargin: 10,
-                     collectionViewInset: UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15),
-                     tags: tags)
+                     cellType: TagCollectionViewCell.self,      // 使用するCellを渡す（計算用）
+                     horizontalMargin: 5,                       // Tag同士の隙間
+                     verticalMargin: 5,                         // Tag同士の隙間
+                     collectionViewInset: UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15),   // 全体のpadding
+                     tags: tags)                                // 実際のタグ
         
+        // collectionViewにLayoutを設定する
         collectionView.setCollectionViewLayout(layout, animated: false)
-
     }
 }
 
