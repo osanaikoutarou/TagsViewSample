@@ -23,10 +23,12 @@ class TagCollectionViewCell: UICollectionViewCell {
 
 /// TagsCollectionViewLayoutに適用する
 extension TagCollectionViewCell: TagCollectionViewCellProrocol {
+    /// タグが入るラベル
     var label: UILabel {
         return label1
     }
     
+    /// ラベル以外の余白
     var insets: UIEdgeInsets {
         return UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
     }
