@@ -8,6 +8,17 @@
 
 import UIKit
 
+private extension UICollectionView {
+    func dequeueReusableCell<T: UICollectionViewCell>(with type: T.Type,
+                                                             for indexPath: IndexPath) -> T {
+        return dequeueReusableCell(withReuseIdentifier: type.className, for: indexPath) as! T
+    }
+}
+
+protocol HasLabelCollectionViewCell: UICollectionViewCell {
+    var label: UILabel { get }
+}
+
 class TagsCollectionViewLayout: UICollectionViewFlowLayout {
     
     var cellFrames:[IndexPath:CGRect] = [:]
@@ -18,6 +29,38 @@ class TagsCollectionViewLayout: UICollectionViewFlowLayout {
     var verticalMargin:CGFloat = 0
     var collectionViewInset:UIEdgeInsets = .zero
     
+    func resetAll() {
+        cellSizes = []
+        cellFrames = [:]
+    }
+    
+    func setup<T: HasLabelCollectionViewCell>(collectionView: UICollectionView,
+                                              cellType: T.Type,
+                                              horizontalMargin:CGFloat,
+                                              verticalMargin:CGFloat,
+                                              collectionViewInset:UIEdgeInsets,
+                                              tags: [String]) {
+        
+        resetAll()
+        
+        self.horizontalMargin = horizontalMargin
+        self.verticalMargin = verticalMargin
+        self.collectionViewInset = collectionViewInset
+
+        let dummyCell = collectionView.dequeueReusableCell(with: cellType, for: IndexPath(item: 0, section: 0))
+        
+        tags.forEach { (str) in
+            // cellの期待width
+            let expectedCellWidth = str.width(withConstrainedHeight: dummyCell.label.frame.height,
+                                              font: dummyCell.label.font)
+            // cellの期待Size
+            cellSizes.append(CGSize(width: expectedCellWidth + TagCollectionViewCell.inset.left + TagCollectionViewCell.inset.right,
+                                    height: dummyCell.label.frame.height + TagCollectionViewCell.inset.top + TagCollectionViewCell.inset.bottom))
+        }
+        
+        calcLayout()
+        
+    }
     /// レイアウトを指定,左上詰めで計算する
     ///
     /// - Parameters:
@@ -25,11 +68,7 @@ class TagsCollectionViewLayout: UICollectionViewFlowLayout {
     ///   - horizontalMargin: cell同士のmargin 上下
     ///   - verticalMargin: cell同士のmargin 左右
     ///   - collectionViewInset: 全体のInset
-    func setup(cellSizes:[CGSize], horizontalMargin:CGFloat, verticalMargin:CGFloat, collectionViewInset:UIEdgeInsets) {
-        self.cellSizes = cellSizes
-        self.horizontalMargin = horizontalMargin
-        self.verticalMargin = verticalMargin
-        self.collectionViewInset = collectionViewInset
+    private func calcLayout() {
         
         // 左上から並べていきます
         
@@ -157,11 +196,21 @@ class TagsCollectionViewLayout: UICollectionViewFlowLayout {
     
 }
 
-extension TagsCollectionViewLayout {
+private extension TagsCollectionViewLayout {
     func attributes(indexPath:IndexPath) -> UICollectionViewLayoutAttributes {
         let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
         attributes.frame = self.cellFrames[indexPath] ?? .zero
         return attributes
     }
     
+}
+
+private extension String {
+    // 幅を計算する
+    func width(withConstrainedHeight height: CGFloat, font: UIFont) -> CGFloat {
+        let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: height)
+        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [.font: font], context: nil)
+
+        return ceil(boundingBox.width)
+    }
 }

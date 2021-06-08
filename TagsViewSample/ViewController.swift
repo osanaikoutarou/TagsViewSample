@@ -11,11 +11,11 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
-    let texts = ["aaaa","bbbb","hogehoge","あいうえお","東京特許許可局許可局長","🎉🎉🎉","あめんぼあかいなあいうえお",
-                 "aaaa","bbbb","hogehoge","あいうえお","東京特許許可局","🎉🎉","あめんぼあかいなあいうえお",
-                 "aaaa","bbbb","hogehoge","あいうえお","東京","🎉🎉🎉","あめんぼ",
-                 "aaaa","bbbb","hogehoge","あいうえお","東京","🎉🎉","あめんぼあかいなあいうえお",
-                 "aaaa","bbbb","hogehoge","あいうえお","東京特許許可局許可局長","🎉🎉🎉","あめんぼあかいなあいうえお",]
+    let tags = ["aaaa","bbbb","hogehoge","あいうえお","東京特許許可局許可局長","🎉🎉🎉","あめんぼあかいなあいうえお",
+                "aaaa","bbbb","hogehoge","あいうえお","東京特許許可局","🎉🎉","あめんぼあかいなあいうえお",
+                "aaaa","bbbb","hogehoge","あいうえお","東京","🎉🎉🎉","あめんぼ",
+                "aaaa","bbbb","hogehoge","あいうえお","東京","🎉🎉","あめんぼあかいなあいうえお",
+                "aaaa","bbbb","hogehoge","あいうえお","東京特許許可局許可局長","🎉🎉🎉","あめんぼあかいなあいうえお",]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,74 +29,63 @@ class ViewController: UIViewController {
     func setupLayout() {
         let layout = TagsCollectionViewLayout()
 
-        var cellSizes:[CGSize] = []
-        let dummyCell = collectionView.dequeueReusableCell(withReuseIdentifier: "TagCollectionViewCell", for: IndexPath(row: 0, section: 0)) as! TagCollectionViewCell
-        texts.forEach { (str) in
-            // cellの期待width
-            let expectedCellWidth = str.width(withConstrainedHeight: dummyCell.label1.frame.height,
-                                              font: dummyCell.label1.font)
-            // cellの期待Size
-            cellSizes.append(CGSize(width: expectedCellWidth + TagCollectionViewCell.inset.left + TagCollectionViewCell.inset.right,
-                                    height: dummyCell.label1.frame.height + TagCollectionViewCell.inset.top + TagCollectionViewCell.inset.bottom))
-        }
-        
-        layout.setup(cellSizes: cellSizes,
+        layout.setup(collectionView: collectionView,
+                     cellType: TagCollectionViewCell.self,
                      horizontalMargin: 10,
                      verticalMargin: 10,
-                     collectionViewInset: UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15))
+                     collectionViewInset: UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15),
+                     tags: tags)
         
         collectionView.setCollectionViewLayout(layout, animated: false)
 
     }
 }
 
+/// UICollectionViewのDelegateとDataSrource
 extension ViewController:UICollectionViewDelegate,UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return texts.count
+        return tags.count
     }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TagCollectionViewCell", for: indexPath) as! TagCollectionViewCell
-        cell.label1.text = texts[indexPath.item]
+        cell.label1.text = tags[indexPath.item]
         return cell
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let text = texts[indexPath.item]
+        let text = tags[indexPath.item]
         print(text)
     }
 }
 
-// MARK: extensions
 
-extension String {
-    func height(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
-        let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
-        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [.font: font], context: nil)
-        
-        return ceil(boundingBox.height)
+//MARK: extension
+
+protocol ClassNameProtocol {
+    static var className: String { get }
+    var className: String { get }
+}
+
+extension ClassNameProtocol {
+    static var className: String {
+        return String(describing: self)
     }
-    
-    // 幅を計算する
-    func width(withConstrainedHeight height: CGFloat, font: UIFont) -> CGFloat {
-        let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: height)
-        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [.font: font], context: nil)
-        
-        return ceil(boundingBox.width)
+
+    var className: String {
+        return type(of: self).className
     }
 }
 
-extension NSAttributedString {
-    func height(withConstrainedWidth width: CGFloat) -> CGFloat {
-        let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
-        let boundingBox = boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, context: nil)
-        
-        return ceil(boundingBox.height)
-    }
-    
-    func width(withConstrainedHeight height: CGFloat) -> CGFloat {
-        let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: height)
-        let boundingBox = boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, context: nil)
-        
-        return ceil(boundingBox.width)
+extension NSObject: ClassNameProtocol {}
+
+extension NSObjectProtocol {
+    var describedProperty: String {
+        let mirror = Mirror(reflecting: self)
+        return mirror.children.map { element -> String in
+            let key = element.label ?? "Unknown"
+            let value = element.value
+            return "\(key): \(value)"
+            }
+            .joined(separator: "\n")
     }
 }
 

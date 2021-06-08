@@ -8,9 +8,10 @@
 
 import UIKit
 
-class TagCollectionViewCell: UICollectionViewCell {
-    @IBOutlet weak var label1: UILabel!
+class TagCollectionViewCell: UICollectionViewCell, HasLabelCollectionViewCell {
     
+    @IBOutlet weak var label1: UILabel!
+        
     // storyboardと合わせる(4つの値を取得するのがやや面倒なので)
     static var inset:UIEdgeInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
     
@@ -20,4 +21,10 @@ class TagCollectionViewCell: UICollectionViewCell {
         self.layer.cornerRadius = self.bounds.height/2.0
         self.clipsToBounds = true
     }
+    
+    var label: UILabel {
+        return label1
+    }
+
 }
+
