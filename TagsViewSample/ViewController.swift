@@ -8,6 +8,15 @@
 
 import UIKit
 
+// 使い方
+// 1 Tagを入れるUICollectionViewCellを定義する
+// 2 そのCellはTagCollectionViewCellProrocolに準拠する
+//   指定するのはタグが入るlabelと、label以外の余白insets
+//   これを用いてCellの期待サイズを計算する
+// 3 TagsCollectionViewLayoutを作成し、setupする
+// 4 作ったlayoutをcollectionViewに反映する
+// 5 UICollectionViewDelegate, UICollectionViewDataSourceを書く
+
 // 与えられたタグのデータ
 let tags = ["aaaa","bbbb","hogehoge","あいうえお","東京特許許可局許可局長","🎉🎉🎉","あめんぼあかいなあいうえお",
             "aaaa","bbbb","hogehoge","あいうえお","東京特許許可局","🎉🎉","あめんぼあかいなあいうえお",
