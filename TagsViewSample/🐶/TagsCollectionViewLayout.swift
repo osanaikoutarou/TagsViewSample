@@ -15,8 +15,11 @@ private extension UICollectionView {
     }
 }
 
-protocol HasLabelCollectionViewCell: UICollectionViewCell {
+protocol TagCollectionViewCellProrocol: UICollectionViewCell {
+    /// タグが入るラベル
     var label: UILabel { get }
+    /// ラベル以外の上下左右の余白分を指定する
+    var insets: UIEdgeInsets { get }
 }
 
 class TagsCollectionViewLayout: UICollectionViewFlowLayout {
@@ -34,12 +37,12 @@ class TagsCollectionViewLayout: UICollectionViewFlowLayout {
         cellFrames = [:]
     }
     
-    func setup<T: HasLabelCollectionViewCell>(collectionView: UICollectionView,
-                                              cellType: T.Type,
-                                              horizontalMargin:CGFloat,
-                                              verticalMargin:CGFloat,
-                                              collectionViewInset:UIEdgeInsets,
-                                              tags: [String]) {
+    func setup<T: TagCollectionViewCellProrocol>(collectionView: UICollectionView,
+                                                 cellType: T.Type,
+                                                 horizontalMargin:CGFloat,
+                                                 verticalMargin:CGFloat,
+                                                 collectionViewInset:UIEdgeInsets,
+                                                 tags: [String]) {
         
         resetAll()
         
@@ -47,6 +50,7 @@ class TagsCollectionViewLayout: UICollectionViewFlowLayout {
         self.verticalMargin = verticalMargin
         self.collectionViewInset = collectionViewInset
 
+        // 計算用のCell
         let dummyCell = collectionView.dequeueReusableCell(with: cellType, for: IndexPath(item: 0, section: 0))
         
         tags.forEach { (str) in
@@ -54,8 +58,8 @@ class TagsCollectionViewLayout: UICollectionViewFlowLayout {
             let expectedCellWidth = str.width(withConstrainedHeight: dummyCell.label.frame.height,
                                               font: dummyCell.label.font)
             // cellの期待Size
-            cellSizes.append(CGSize(width: expectedCellWidth + TagCollectionViewCell.inset.left + TagCollectionViewCell.inset.right,
-                                    height: dummyCell.label.frame.height + TagCollectionViewCell.inset.top + TagCollectionViewCell.inset.bottom))
+            cellSizes.append(CGSize(width: expectedCellWidth + dummyCell.insets.left + dummyCell.insets.right,
+                                    height: dummyCell.label.frame.height + dummyCell.insets.top + dummyCell.insets.bottom))
         }
         
         calcLayout()
